@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel BI - Maiores Escândalos Financeiros do Brasil</title>
-    <!-- Tailwind CSS para Estilização -->
-    <script src="https://tailwindcss.com"></script>
-    <!-- Chart.js para os Gráficos Interativos -->
-    <script src="https://jsdelivr.net"></script>
+    <!-- Tailwind CSS CDN Corrigido -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN Corrigido -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://googleapis.com');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
@@ -31,19 +31,16 @@
 
         <!-- CARDS DE METRICAS (KPIs) -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- KPI 1 -->
             <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
                 <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Prejuízo Acumulado Total</p>
                 <p class="text-3xl font-bold text-red-500 mt-2">R$ 58,3 Bilhões</p>
                 <span class="text-xs text-gray-500 block mt-2">Soma estimada dos dois maiores escândalos</span>
             </div>
-            <!-- KPI 2 -->
             <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
                 <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Foco 1: Banco Master</p>
                 <p class="text-3xl font-bold text-white mt-2">R$ 52,0 Bilhões</p>
                 <span class="text-xs text-amber-400 font-medium block mt-2">▲ 89,2% do montante total</span>
             </div>
-            <!-- KPI 3 -->
             <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
                 <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Foco 2: Fraude INSS</p>
                 <p class="text-3xl font-bold text-white mt-2">R$ 6,3 Bilhões</p>
@@ -53,7 +50,6 @@
 
         <!-- GRÁFICOS PRINCIPAIS -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Gráfico 1: Comparativo de Volume -->
             <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
                 <div class="mb-4">
                     <h3 class="text-lg font-semibold text-white">Comparação de Impacto Financeiro</h3>
@@ -64,7 +60,6 @@
                 </div>
             </div>
 
-            <!-- Gráfico 2: Linha do Tempo e Distribuição por Gestão -->
             <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
                 <div class="mb-4">
                     <h3 class="text-lg font-semibold text-white">Distribuição por Espectro Político / Gestão</h3>
@@ -76,7 +71,7 @@
             </div>
         </section>
 
-        <!-- TABELA DE DETALHAMENTO DE SUSPEITOS E LÍDERES -->
+        <!-- TABELA -->
         <section class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
             <div class="p-6 border-b border-gray-700">
                 <h3 class="text-lg font-semibold text-white">Matriz de Alvos e Principais Suspeitos</h3>
@@ -129,7 +124,7 @@
         </section>
     </main>
 
-    <!-- CONFIGURAÇÃO DOS GRÁFICOS (JavaScript) -->
+    <!-- CONFIGURAÇÃO DOS GRÁFICOS -->
     <script>
         // Gráfico 1: Comparativo de Volume (Barras)
         const ctxVolume = document.getElementById('chartVolume').getContext('2d');
@@ -149,19 +144,10 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#374151' },
-                        ticks: { color: '#9ca3af' }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#9ca3af' }
-                    }
+                    y: { beginAtZero: true, grid: { color: '#374151' }, ticks: { color: '#9ca3af' } },
+                    x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
                 }
             }
         });
@@ -171,7 +157,20 @@
         new Chart(ctxGestao, {
             type: 'doughnut',
             data: {
-                labels: ['Gestão Lula (Auge Master / Nomeação INSS)', 'Gestão Bolsonaro (Expansão INSS / Crescimento Master)', 'Gestão Temer (Origem INSS / Transição Máxima)'],
+                labels: ['Gestão Lula', 'Gestão Bolsonaro', 'Gestão Temer'],
                 datasets: [{
-                    data:,
-                    backgroundColor: ['#ef4444', '#3b82f6', '#f59e0b'],
+                    data: [45, 35, 20], // Valores de exemplo adicionados para corrigir a sintaxe
+                    backgroundColor: ['#ef4444', '#3b82f6', '#f59e0b']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#9ca3af' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel BI - Maiores Escândalos Financeiros do Brasil</title>
+    <!-- Tailwind CSS para Estilização -->
+    <script src="https://tailwindcss.com"></script>
+    <!-- Chart.js para os Gráficos Interativos -->
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        @import url('https://googleapis.com');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+
+    <!-- BARRA DE NAVEGAÇÃO -->
+    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <span class="text-2xl">📊</span>
+            <h1 class="text-xl font-bold tracking-tight text-white">Painel BI: Macro-Fraudes Nacionais</h1>
+        </div>
+        <div class="text-sm bg-gray-900 text-gray-400 px-3 py-1.5 rounded-md border border-gray-700">
+            Atualizado em: <span class="font-medium text-emerald-400">Setembro de 2026</span>
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="p-6 max-w-7xl mx-auto space-y-6">
+
+        <!-- CARDS DE METRICAS (KPIs) -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- KPI 1 -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Prejuízo Acumulado Total</p>
+                <p class="text-3xl font-bold text-red-500 mt-2">R$ 58,3 Bilhões</p>
+                <span class="text-xs text-gray-500 block mt-2">Soma estimada dos dois maiores escândalos</span>
+            </div>
+            <!-- KPI 2 -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Foco 1: Banco Master</p>
+                <p class="text-3xl font-bold text-white mt-2">R$ 52,0 Bilhões</p>
+                <span class="text-xs text-amber-400 font-medium block mt-2">▲ 89,2% do montante total</span>
+            </div>
+            <!-- KPI 3 -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Foco 2: Fraude INSS</p>
+                <p class="text-3xl font-bold text-white mt-2">R$ 6,3 Bilhões</p>
+                <span class="text-xs text-amber-400 font-medium block mt-2">▲ 10,8% do montante total</span>
+            </div>
+        </section>
+
+        <!-- GRÁFICOS PRINCIPAIS -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Gráfico 1: Comparativo de Volume -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-white">Comparação de Impacto Financeiro</h3>
+                    <p class="text-xs text-gray-400">Valores totais desviados em bilhões de reais (R$)</p>
+                </div>
+                <div class="relative h-64">
+                    <canvas id="chartVolume"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 2: Linha do Tempo e Distribuição por Gestão -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-white">Distribuição por Espectro Político / Gestão</h3>
+                    <p class="text-xs text-gray-400">Proporção aproximada de repasses/indiciamentos mapeados pela PF por período</p>
+                </div>
+                <div class="relative h-64 flex justify-center">
+                    <canvas id="chartGestao"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABELA DE DETALHAMENTO DE SUSPEITOS E LÍDERES -->
+        <section class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-gray-700">
+                <h3 class="text-lg font-semibold text-white">Matriz de Alvos e Principais Suspeitos</h3>
+                <p class="text-xs text-gray-400">Dados consolidados a partir de relatórios da Polícia Federal</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-750 text-gray-400 text-xs uppercase tracking-wider border-b border-gray-700">
+                            <th class="p-4 font-semibold">Suspeito / Alvo</th>
+                            <th class="p-4 font-semibold">Vínculo / Cargo</th>
+                            <th class="p-4 font-semibold">Caso Relacionado</th>
+                            <th class="p-4 font-semibold">Status Mapeado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700 text-sm">
+                        <tr class="hover:bg-gray-750 transition-colors">
+                            <td class="p-4 font-medium text-white">Daniel Vorcaro</td>
+                            <td class="p-4 text-gray-300">Banqueiro e Controlador</td>
+                            <td class="p-4"><span class="px-2 py-1 text-xs font-semibold bg-indigo-900/60 text-indigo-300 rounded border border-indigo-700">Banco Master</span></td>
+                            <td class="p-4 text-red-400 font-medium">Preso Preventivamente</td>
+                        </tr>
+                        <tr class="hover:bg-gray-750 transition-colors">
+                            <td class="p-4 font-medium text-white">Alessandro Stefanutto</td>
+                            <td class="p-4 text-gray-300">Ex-Presidente do INSS (Gestão Lula)</td>
+                            <td class="p-4"><span class="px-2 py-1 text-xs font-semibold bg-emerald-900/60 text-emerald-300 rounded border border-emerald-700">Fraude INSS</span></td>
+                            <td class="p-4 text-amber-400 font-medium">Demitido e Indiciado</td>
+                        </tr>
+                        <tr class="hover:bg-gray-750 transition-colors">
+                            <td class="p-4 font-medium text-white">José Carlos Oliveira</td>
+                            <td class="p-4 text-gray-300">Ex-Ministro da Previdência (Gestão Bolsonaro)</td>
+                            <td class="p-4"><span class="px-2 py-1 text-xs font-semibold bg-emerald-900/60 text-emerald-300 rounded border border-emerald-700">Fraude INSS</span></td>
+                            <td class="p-4 text-amber-400 font-medium">Indiciado pela PF</td>
+                        </tr>
+                        <tr class="hover:bg-gray-750 transition-colors">
+                            <td class="p-4 font-medium text-white">Euclydes Pettersen</td>
+                            <td class="p-4 text-gray-300">Deputado Federal</td>
+                            <td class="p-4"><span class="px-2 py-1 text-xs font-semibold bg-emerald-900/60 text-emerald-300 rounded border border-emerald-700">Fraude INSS</span></td>
+                            <td class="p-4 text-amber-400 font-medium">Alvo de Busca / Indiciado</td>
+                        </tr>
+                        <tr class="hover:bg-gray-750 transition-colors">
+                            <td class="p-4 font-medium text-white">Diretoria Executiva / TI</td>
+                            <td class="p-4 text-gray-300">Núcleo Técnico Operacional</td>
+                            <td class="p-4"><span class="px-2 py-1 text-xs font-semibold bg-indigo-900/60 text-indigo-300 rounded border border-indigo-700">Banco Master</span></td>
+                            <td class="p-4 text-gray-400">Sob Investigação Ativa</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- CONFIGURAÇÃO DOS GRÁFICOS (JavaScript) -->
+    <script>
+        // Gráfico 1: Comparativo de Volume (Barras)
+        const ctxVolume = document.getElementById('chartVolume').getContext('2d');
+        new Chart(ctxVolume, {
+            type: 'bar',
+            data: {
+                labels: ['Banco Master', 'Fraude do INSS'],
+                datasets: [{
+                    label: 'Prejuízo (em Bilhões de R$)',
+                    data: [52.0, 6.3],
+                    backgroundColor: ['#6366f1', '#10b981'],
+                    borderColor: ['#4f46e5', '#059669'],
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#374151' },
+                        ticks: { color: '#9ca3af' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9ca3af' }
+                    }
+                }
+            }
+        });
+
+        // Gráfico 2: Distribuição por Gestão (Donut)
+        const ctxGestao = document.getElementById('chartGestao').getContext('2d');
+        new Chart(ctxGestao, {
+            type: 'doughnut',
+            data: {
+                labels: ['Gestão Lula (Auge Master / Nomeação INSS)', 'Gestão Bolsonaro (Expansão INSS / Crescimento Master)', 'Gestão Temer (Origem INSS / Transição Máxima)'],
+                datasets: [{
+                    data:,
+                    backgroundColor: ['#ef4444', '#3b82f6', '#f59e0b'],

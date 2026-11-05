@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Econômico: Salário Mínimo vs. Cesta Básica (2019-2026)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        bolsonaro: {
+                            light: '#38bdf8',
+                            DEFAULT: '#0284c7',
+                            dark: '#0369a1'
+                        },
+                        lula: {
+                            light: '#f87171',
+                            DEFAULT: '#dc2626',
+                            dark: '#991b1b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-sky-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-sky-500/10 border border-sky-500/20 rounded-xl text-sky-400">
+                    <i class="fa-solid me-1 fa-chart-line text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white leading-tight">Brasil Econômico</h1>
+                    <p class="text-xs text-slate-400">Salário Mínimo vs. Cesta Básica (SP/DIEESE)</p>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="flex items-center space-x-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs sm:text-sm">
+                <button id="btn-all" onclick="filterPeriod('all')" class="px-3 py-1.5 rounded-lg font-medium transition-all duration-200 bg-sky-600 text-white shadow-sm">
+                    Todos os Anos (2019-2026)
+                </button>
+                <button id="btn-bolsonaro" onclick="filterPeriod('bolsonaro')" class="px-3 py-1.5 rounded-lg font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800">
+                    Gov. Bolsonaro (2019-2022)
+                </button>
+                <button id="btn-lula" onclick="filterPeriod('lula')" class="px-3 py-1.5 rounded-lg font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800">
+                    Gov. Lula (2023-2026)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Executive Summary Cards (KPIs) -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- KPI 1 -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Salário Mínimo Atual/Final</p>
+                        <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="kpi-min-wage">R$ 1.621,00</h3>
+                        <p class="text-xs text-slate-400 mt-1" id="kpi-min-wage-sub">Referência 2026</p>
+                    </div>
+                    <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                        <i class="fa-solid fa-money-bill-wave text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Evolução 2019 → 2026</span>
+                    <span class="text-emerald-400 font-semibold">+62.4%</span>
+                </div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Cesta Básica Média (SP)</p>
+                        <h3 class="text-2xl font-bold text-amber-400 mt-1" id="kpi-basket">R$ 875,00</h3>
+                        <p class="text-xs text-slate-400 mt-1" id="kpi-basket-sub">Projeção/Média 2026</p>
+                    </div>
+                    <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl">
+                        <i class="fa-solid fa-basket-shopping text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Aumento acumulado do custo</span>
+                    <span class="text-amber-400 font-semibold">+68.7%</span>
+                </div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Pico de Comprometimento</p>
+                        <h3 class="text-2xl font-bold text-rose-500 mt-1" id="kpi-peak">65.3%</h3>
+                        <p class="text-xs text-slate-400 mt-1" id="kpi-peak-sub">Dezembro de 2022</p>
+                    </div>
+                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+                    <span>% do salário consumido</span>
+                    <span class="text-rose-400 font-semibold">Maior pressão</span>
+                </div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-slate-700 transition">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Comprometimento Atual</p>
+                        <h3 class="text-2xl font-bold text-sky-400 mt-1" id="kpi-current-ratio">53.9%</h3>
+                        <p class="text-xs text-slate-400 mt-1" id="kpi-current-ratio-sub">Média 2025-2026</p>
+                    </div>
+                    <div class="p-3 bg-sky-500/10 text-sky-400 rounded-xl">
+                        <i class="fa-solid fa-scale-balanced text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+                    <span>Status de Alívio</span>
+                    <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-arrow-down me-1"></i> -11.4 p.p. vs pico</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Charts Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 1: Line Chart (Valor em Reais) -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-base font-semibold text-white">Evolução Nominal em Reais (R$)</h2>
+                        <p class="text-xs text-slate-400">Comparação entre o valor nominal do Salário Mínimo e a Cesta Básica (DIEESE/SP)</p>
+                    </div>
+                    <div class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">
+                        Valores Brutos
+                    </div>
+                </div>
+                <div class="relative h-72 w-full">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Bar/Area Chart (% Comprometimento) -->
+            <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-base font-semibold text-white">% do Salário Mínimo Comprometido</h2>
+                        <p class="text-xs text-slate-400">Proporção do piso nacional gasta para comprar uma cesta básica</p>
+                    </div>
+                    <div class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">
+                        Impacto Orcamentário
+                    </div>
+                </div>
+                <div class="relative h-72 w-full">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Data Tables Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Table 1: Governo Bolsonaro -->
+            <div id="table-bolsonaro-container" class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-sky-500"></span>
+                        <h3 class="text-base font-bold text-white">Governo Jair Bolsonaro (2019 – 2022)</h3>
+                    </div>
+                    <span class="text-xs font-semibold px-2.5 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full">4 Anos</span>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-800">
+                                <th class="pb-2 font-semibold">Ano</th>
+                                <th class="pb-2 font-semibold">Salário Mínimo</th>
+                                <th class="pb-2 font-semibold">Cesta Básica (SP)</th>
+                                <th class="pb-2 font-semibold text-right">% Comprometido</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/50">
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-2.5 font-medium text-slate-200">2019</td>
+                                <td class="py-2.5 text-slate-300">R$ 998,00</td>
+                                <td class="py-2.5 text-slate-300">R$ 518,50</td>
+                                <td class="py-2.5 text-right font-medium text-sky-400">52,0%</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-2.5 font-medium text-slate-200">2020</td>
+                                <td class="py-2.5 text-slate-300">R$ 1.045,00</td>
+                                <td class="py-2.5 text-slate-300">R$ 628,47</td>
+                                <td class="py-2.5 text-right font-medium text-amber-400">60,1%</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-2.5 font-medium text-slate-200">2021</td>
+                                <td class="py-2.5 text-slate-300">R$ 1.100,00</td>
+                                <td class="py-2.5 text-slate-300">R$ 690,51</td>
+                                <td class="py-2.5 text-right font-medium text-amber-400">62,7%</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40 transition bg-rose-500/5">
+                                <td class="py-2.5 font-medium text-slate-200">2022</td>
+                                <td class="py-2.5 text-slate-300">R$ 1.212,00</td>
+                                <td class="py-2.5 text-slate-300">R$ 791,29</td>
+                                <td class="py-2.5 text-right font-bold text-rose-400">65,3% <i class="fa-solid fa-triangle-exclamation text-xs ml-1"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60 text-xs text-slate-400 leading-relaxed">
+                    <strong class="text-slate-300">Resumo:</strong> O salário era reajustado estritamente pela inflação (INPC). Pandemia, alta do dólar e commodities elevaram o comprometimento de 52% para 65,3%.
+                </div>
+            </div>
+
+            <!-- Table 2: Governo Lula -->
+            <div id="table-lula-container" class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                        <h3 class="text-base font-bold text-white">Governo Luiz Inácio Lula da Silva (2023 – 2026)</h3>
+                    </div>
+                    <span class="text-xs font-semibold px-2.5 py-1 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full">4 Anos</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-800">
+                                <th class="pb-2 font-semibold">Ano</th>
+                                <th class="pb-2 font-semibold">Salário Mínimo</th>
+                                <th class="pb-2 font-semibold">Cesta Básica (SP)</th>
+                                <th class="pb-2 font-semibold text-right">% Comprometido</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/50">
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-2.5 font-medium text-slate-200">2023</td>
+                                <td class="py-2.5 text-slate-300">R$ 1.320,00*</td>
+                                <td class="py-2.5 text-slate-300">R$ 772,51</td>
+                                <td class="py-2.5 text-right font-medium text-amber-400">58,5%</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-2.5 font-medium text-slate-200">2024</td>
+                                <td class="py-2.5 text-slate-300">R$ 1.412,00</td>
+                                <td class="py-2.5 text-slate-300">R$ 851,82</td>
+                                <td class="py-2.5 text-right font-medium text-amber-400">60,3%</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40 transition">
+                                <td class="py-2.5 font-medium text-slate-200">2025</td>
+                                <td class="py-2.5 text-slate-300">R$ 1.518,00</td>
+                                <td class="py-2.5 text-slate-300">R$ 830,00</td>
+                                <td class="py-2.5 text-right font-medium text-emerald-400">54,7%</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40 transition bg-emerald-500/5">
+                                <td class="py-2.5 font-medium text-slate-200">2026</td>
+                                <td class="py-2.5 text-slate-300">R$ 1.621,00</td>
+                                <td class="py-2.5 text-slate-300">R$ 875,00</td>
+                                <td class="py-2.5 text-right font-bold text-emerald-400">53,9% <i class="fa-solid fa-arrow-trend-down text-xs ml-1"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60 text-xs text-slate-400 leading-relaxed">
+                    <strong class="text-slate-300">Resumo:</strong> Retorno da regra de ganho real (INPC + PIB). Após repiques de inflação nos alimentos em 2023-2024, o comprometimento baixou de ~60% para ~54%.
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Comparative Analytical Insights Section -->
+        <section class="bg-slate-900 border border-slate-800/80 rounded-2xl p-6 shadow-lg space-y-6">
+            <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                <div class="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl">
+                    <i class="fa-solid fa-lightbulb text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-white">Análise Econômica & Contexto dos Períodos</h2>
+                    <p class="text-xs text-slate-400">Fatores determinantes que impactaram o poder de compra e o custo dos alimentos</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex items-center space-x-2 text-sky-400 font-semibold">
+                        <i class="fa-solid fa-calculator"></i>
+                        <h3>Política de Reajuste</h3>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        <strong class="text-white">Bolsonaro:</strong> Foco na manutenção do teto de gastos; os aumentos eram limitados estritamente ao reajuste da inflação acumulada pelo INPC.<br><br>
+                        <strong class="text-white">Lula:</strong> Retomada da fórmula de ganho real, somando a inflação (INPC) com a variação do PIB de dois anos anteriores.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex items-center space-x-2 text-amber-400 font-semibold">
+                        <i class="fa-solid fa-earth-americas"></i>
+                        <h3>Choques Externos & Alimentos</h3>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Entre 2020 e 2022, a pandemia de COVID-19, a desvalorização do Real frente ao Dólar e a Guerra na Ucrânia encareceram significativamente os grãos, fertilizantes e combustíveis no mercado mundial.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex items-center space-x-2 text-emerald-400 font-semibold">
+                        <i class="fa-solid fa-wallet"></i>
+                        <h3>Impacto no Poder de Compra</h3>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        No final de 2022 atingiu-se o menor poder de compra relativo da série (65,3% do salário para a cesta básica). A partir de 2025, com a maior estabilidade do custo dos alimentos e elevação real dos salários, a taxa recuou para a faixa dos 53-54%.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900/50 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            Fonte dos Dados: DIEESE (Cesta Básica Nacional / São Paulo) & Ministério da Economia / Fazenda.
+        </div>
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        // Full Dataset
+        const fullData = [
+            { year: '2019', salary: 998.00, basket: 518.50, percent: 52.0, gov: 'bolsonaro' },
+            { year: '2020', salary: 1045.00, basket: 628.47, percent: 60.1, gov: 'bolsonaro' },
+            { year: '2021', salary: 1100.00, basket: 690.51, percent: 62.7, gov: 'bolsonaro' },
+            { year: '2022', salary: 1212.00, basket: 791.29, percent: 65.3, gov: 'bolsonaro' },
+            { year: '2023', salary: 1320.00, basket: 772.51, percent: 58.5, gov: 'lula' },
+            { year: '2024', salary: 1412.00, basket: 851.82, percent: 60.3, gov: 'lula' },
+            { year: '2025', salary: 1518.00, basket: 830.00, percent: 54.7, gov: 'lula' },
+            { year: '2026', salary: 1621.00, basket: 875.00, percent: 53.9, gov: 'lula' }
+        ];
+
+        let lineChartInstance = null;
+        let barChartInstance = null;
+
+        // Initialize Dashboard Charts
+        function initCharts() {
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+
+            // Line Chart: Salary vs Basket
+            lineChartInstance = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: fullData.map(d => d.year),
+                    datasets: [
+                        {
+                            label: 'Salário Mínimo (R$)',
+                            data: fullData.map(d => d.salary),
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'Cesta Básica SP (R$)',
+                            data: fullData.map(d => d.basket),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: R$ ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            grid: { color: '#1e293b' },
+                            ticks: { 
+                                color: '#94a3b8',
+                                callback: value => 'R$ ' + value
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Bar Chart: % Comprometimento
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: fullData.map(d => d.year),
+                    datasets: [{
+                        label: '% Comprometido',
+                        data: fullData.map(d => d.percent),
+                        backgroundColor: fullData.map(d => d.gov === 'bolsonaro' ? 'rgba(2, 132, 199, 0.75)' : 'rgba(220, 38, 38, 0.75)'),
+                        borderColor: fullData.map(d => d.gov === 'bolsonaro' ? '#0284c7' : '#dc2626'),
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Comprometimento: ${context.parsed.y.toFixed(1)}% do salário`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            min: 40,
+                            max: 70,
+                            grid: { color: '#1e293b' },
+                            ticks: { 
+                                color: '#94a3b8',
+                                callback: value => value + '%'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Filter Logic
+        function filterPeriod(period) {
+            // Update button styles
+            ['all', 'bolsonaro', 'lula'].forEach(p => {
+                const btn = document.getElementById(`btn-${p}`);
+                if (p === period) {
+                    btn.className = "px-3 py-1.5 rounded-lg font-medium transition-all duration-200 bg-sky-600 text-white shadow-sm";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800";
+                }
+            });
+
+            let filtered = fullData;
+            if (period === 'bolsonaro') {
+                filtered = fullData.filter(d => d.gov === 'bolsonaro');
+                document.getElementById('table-bolsonaro-container').style.display = 'block';
+                document.getElementById('table-lula-container').style.display = 'none';
+            } else if (period === 'lula') {
+                filtered = fullData.filter(d => d.gov === 'lula');
+                document.getElementById('table-bolsonaro-container').style.display = 'none';
+                document.getElementById('table-lula-container').style.display = 'block';
+            } else {
+                document.getElementById('table-bolsonaro-container').style.display = 'block';
+                document.getElementById('table-lula-container').style.display = 'block';
+            }
+
+            // Update Charts
+            lineChartInstance.data.labels = filtered.map(d => d.year);
+            lineChartInstance.data.datasets[0].data = filtered.map(d => d.salary);
+            lineChartInstance.data.datasets[1].data = filtered.map(d => d.basket);
+            lineChartInstance.update();
+
+            barChartInstance.data.labels = filtered.map(d => d.year);
+            barChartInstance.data.datasets[0].data = filtered.map(d => d.percent);
+            barChartInstance.data.datasets[0].backgroundColor = filtered.map(d => d.gov === 'bolsonaro' ? 'rgba(2, 132, 199, 0.75)' : 'rgba(220, 38, 38, 0.75)');
+            barChartInstance.data.datasets[0].borderColor = filtered.map(d => d.gov === 'bolsonaro' ? '#0284c7' : '#dc2626');
+            barChartInstance.update();
+
+            // Update KPI cards based on filter
+            const lastItem = filtered[filtered.length - 1];
+            const firstItem = filtered[0];
+
+            document.getElementById('kpi-min-wage').innerText = `R$ ${lastItem.salary.toFixed(2)}`;
+            document.getElementById('kpi-min-wage-sub').innerText = `Ano Ref.: ${lastItem.year}`;
+            
+            document.getElementById('kpi-basket').innerText = `R$ ${lastItem.basket.toFixed(2)}`;
+            document.getElementById('kpi-basket-sub').innerText = `Ano Ref.: ${lastItem.year}`;
+
+            const peakInFilter = Math.max(...filtered.map(d => d.percent));
+            const peakYear = filtered.find(d => d.percent === peakInFilter).year;
+            document.getElementById('kpi-peak').innerText = `${peakInFilter.toFixed(1)}%`;
+            document.getElementById('kpi-peak-sub').innerText = `Pico do período (${peakYear})`;
+
+            document.getElementById('kpi-current-ratio').innerText = `${lastItem.percent.toFixed(1)}%`;
+            document.getElementById('kpi-current-ratio-sub').innerText = `Registrado em ${lastItem.year}`;
+        }
+
+        // Initialize on DOM ready
+        window.onload = function() {
+            initCharts();
+        };
+    </script>
+</body>
+</html>
